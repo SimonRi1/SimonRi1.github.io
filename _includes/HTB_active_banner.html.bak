@@ -1,0 +1,16 @@
+<div style="background-color: #1e1b2e; padding: 40px 20px; border-radius: 8px; border: 1px solid #333; text-align: center; font-family: sans-serif; margin: 30px 0;">
+    
+    <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+    
+    <h3 style="color: #ffffff; font-weight: 500; margin-top: 0; margin-bottom: 25px;">Machine is Still Active!</h3>
+    
+    <p style="color: #b3a9cc; font-size: 16px; line-height: 1.6; max-width: 600px; margin: 0 auto 20px auto;">
+        <!-- Qui usiamo Liquid per prendere il nome della macchina che passerai dal post -->
+        <strong style="color: #ff79c6; font-weight: normal;">{{ include.machine_name | default: "This machine" }}</strong> is an <strong style="color: #d0d0d0;">ACTIVE</strong> machine on Hack The Box. In accordance with HTB's community rules, the solution for this machine will remain hidden until it is officially retired.
+    </p>
+    
+    <p style="color: #b3a9cc; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+        If you need hints or want to discuss the box, head over to the <a href="https://discord.gg/hackthebox" style="color: #66ff00; text-decoration: underline;">Hack The Box Discord</a>.
+    </p>
+    
+</div>
