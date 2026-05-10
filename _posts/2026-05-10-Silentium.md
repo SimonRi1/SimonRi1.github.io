@@ -5,7 +5,7 @@ date: 2026-04-28
 toc: true
 categories: [HTB, WriteUp]
 tags: [linux, easy, season 10, cve, web, api]
-image: /assets/img/htb/facts/Silentium_cover.png
+image: /assets/img/htb/silentium/Silentium_cover.png
 ---
 
 {% include HTB_achievement.html id="867" %}
