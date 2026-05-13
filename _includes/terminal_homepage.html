@@ -116,128 +116,67 @@
 
 <!-- LOGICA JAVASCRIPT -->
 <script>
-  const terminalScript = [
-    { 
-      prompt: "simone@localhost:~$ ", 
-      isRoot: false, 
-      cmd: "whoami", 
-      out: "simone",
-      delayAfter: 2000,
-      backspace: true
-    },
-    { 
-      prompt: "simone@localhost:~$ ", 
-      isRoot: false, 
-      cmd: "sudo -l", 
-      out: "User simone may run the following commands on localhost:\n    (root) NOPASSWD: /usr/bin/python3",
-      delayAfter: 4000,
-      backspace: true
-    },
-    { 
-      prompt: "simone@localhost:~$ ", 
-      isRoot: false, 
-      cmd: "sudo python3 -c 'import os; os.system(\"/bin/bash\")'", 
-      out: "", 
-      delayAfter: 400,
-      backspace: false
-    },
-    { 
-      prompt: "root@localhost:~# ", 
-      isRoot: true, 
-      cmd: "whoami", 
-      out: "root",
-      delayAfter: 2000,
-      backspace: true
-    },
-    { 
-      prompt: "root@localhost:~# ", 
-      isRoot: true, 
-      cmd: "cat /root/flag.txt", 
-      out: "THM{w3lc0m3_t0_my_p0rtf0l10}",
-      delayAfter: 6000,
-      backspace: true
-    }
-  ];
-
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-  async function typeWriter(element, text) {
-    element.textContent = "";
-    if (!text) return;
-    for (let i = 0; i < text.length; i++) {
-      element.textContent += text.charAt(i);
-      await sleep(Math.random() * 50 + 50);
-    }
-  }
-
-  async function backspaceWriter(element) {
-    let text = element.textContent;
-    while (text.length > 0) {
-      text = text.slice(0, -1);
-      element.textContent = text;
-      await sleep(30);
-    }
-  }
-
-  // Variabile globale per evitare loop multipli se l'utente naviga avanti e indietro
-  window.terminalRunning = false;
-
-  async function runTerminal() {
-    // Se l'animazione è già partita, non avviarne un'altra
-    if (window.terminalRunning) return;
-    
-    const promptEl = document.getElementById('prompt');
-    const cmdEl = document.getElementById('command');
-    const outEl = document.getElementById('output');
-
-    // Se gli elementi non esistono (es. siamo in una pagina diversa), esci
-    if (!promptEl || !cmdEl || !outEl) return;
-
-    window.terminalRunning = true;
-    let i = 0;
-
-    while (window.terminalRunning) {
-      const step = terminalScript[i];
-      
-      // Verifica sicurezza: se l'utente ha cambiato pagina, ferma tutto
-      if (!document.getElementById('prompt')) {
-        window.terminalRunning = false;
-        break;
+  (function() {
+    const terminalScript = [
+      { prompt: "simone@localhost:~$ ", isRoot: false, cmd: "whoami", out: "simone", delayAfter: 4000, backspace: true },
+      { prompt: "simone@localhost:~$ ", isRoot: false, cmd: "sudo -l", out: "User simone may run the following commands on localhost:\n    (root) NOPASSWD: /usr/bin/python3", delayAfter: 5000, backspace: true },
+      { prompt: "simone@localhost:~$ ", isRoot: false, cmd: "sudo python3 -c 'import os; os.system(\"/bin/bash\")'", out: "", delayAfter: 400, backspace: false },
+      { prompt: "root@localhost:~# ", isRoot: true, cmd: "whoami", out: "root", delayAfter: 3000, backspace: true },
+      { prompt: "root@localhost:~# ", isRoot: true, cmd: "cat /root/flag.txt", out: "HTB{w3lc0m3_t0_my_p0rtf0l10}", delayAfter: 6000, backspace: true }
+    ];
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    async function typeWriter(element, text, targetPrompt) {
+      element.textContent = "";
+      if (!text) return;
+      for (let i = 0; i < text.length; i++) {
+        if (!document.body.contains(targetPrompt)) return;
+        element.textContent += text.charAt(i);
+        await sleep(Math.random() * 50 + 50);
       }
-
-      outEl.textContent = "";
-      cmdEl.textContent = ""; 
-      promptEl.textContent = step.prompt;
-      promptEl.className = step.isRoot ? "prompt-root" : "prompt-user";
-
-      await sleep(800);
-      await typeWriter(cmdEl, step.cmd);
-      await sleep(400);
-
-      if (step.out !== "") {
-        outEl.innerHTML = step.out.replace(/\n/g, '<br>');
+    }
+    async function backspaceWriter(element, targetPrompt) {
+      let text = element.textContent;
+      while (text.length > 0) {
+        if (!document.body.contains(targetPrompt)) return;
+        text = text.slice(0, -1);
+        element.textContent = text;
+        await sleep(30);
       }
-
-      await sleep(step.delayAfter);
-
-      if (step.backspace) {
+    }
+    async function startAnimation() {
+      const promptEl = document.getElementById('prompt');
+      const cmdEl = document.getElementById('command');
+      const outEl = document.getElementById('output');
+      if (!promptEl || !cmdEl || !outEl || promptEl.dataset.running === "true") return;
+      promptEl.dataset.running = "true";
+      let i = 0;
+      while (document.body.contains(promptEl)) {
+        const step = terminalScript[i];
         outEl.textContent = "";
-        await sleep(200);
-        await backspaceWriter(cmdEl);
+        cmdEl.textContent = ""; 
+        promptEl.textContent = step.prompt;
+        promptEl.className = step.isRoot ? "prompt-root" : "prompt-user";
+        await sleep(800);
+        if (!document.body.contains(promptEl)) break;
+        await typeWriter(cmdEl, step.cmd, promptEl);
+        if (!document.body.contains(promptEl)) break;
+        await sleep(400);
+        if (!document.body.contains(promptEl)) break;
+        if (step.out !== "") {
+          outEl.innerHTML = step.out.replace(/\n/g, '<br>');
+        }
+        await sleep(step.delayAfter);
+        if (!document.body.contains(promptEl)) break;
+        if (step.backspace) {
+          outEl.textContent = "";
+          await sleep(200);
+          await backspaceWriter(cmdEl, promptEl);
+        }
+        i = (i + 1) % terminalScript.length;
       }
-
-      i = (i + 1) % terminalScript.length;
     }
-  }
-
-  // AVVIO IMMEDIATO + COMPATIBILITÀ CHIRPY
-  // Invece di solo DOMContentLoaded, proviamo diversi trigger
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-    runTerminal();
-  } else {
-    document.addEventListener("DOMContentLoaded", runTerminal);
-  }
-
-  // Supporto specifico per i temi che usano Pjax/Turbo (come Chirpy)
-  document.addEventListener("pjax:success", runTerminal);
+    startAnimation();
+    document.addEventListener("pjax:success", startAnimation);
+    document.addEventListener("DOMContentLoaded", startAnimation);
+  })();
 </script>
