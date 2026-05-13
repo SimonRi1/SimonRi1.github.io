@@ -118,8 +118,8 @@
 <script>
   (function() {
     const terminalScript = [
-      { prompt: "simone@localhost:~$ ", isRoot: false, cmd: "whoami", out: "simone", delayAfter: 4000, backspace: true },
-      { prompt: "simone@localhost:~$ ", isRoot: false, cmd: "sudo -l", out: "User simone may run the following commands on localhost:\n    (root) NOPASSWD: /usr/bin/python3", delayAfter: 5000, backspace: true },
+      { prompt: "simone@localhost:~$ ", isRoot: false, cmd: "whoami", out: "simone", delayAfter: 3000, backspace: true },
+      { prompt: "simone@localhost:~$ ", isRoot: false, cmd: "sudo -l", out: "User simone may run the following commands on localhost:\n    (root) NOPASSWD: /usr/bin/python3", delayAfter: 4000, backspace: true },
       { prompt: "simone@localhost:~$ ", isRoot: false, cmd: "sudo python3 -c 'import os; os.system(\"/bin/bash\")'", out: "", delayAfter: 400, backspace: false },
       { prompt: "root@localhost:~# ", isRoot: true, cmd: "whoami", out: "root", delayAfter: 3000, backspace: true },
       { prompt: "root@localhost:~# ", isRoot: true, cmd: "cat /root/flag.txt", out: "HTB{w3lc0m3_t0_my_p0rtf0l10}", delayAfter: 6000, backspace: true }
