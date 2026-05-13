@@ -15,50 +15,57 @@
 
 <!-- STILI CSS -->
 <style>
-  /* Contenitore principale: centra tutto nella pagina */
+
+@import url('https://cdn.jsdelivr.net/npm/@fontsource/0xproto/index.css');
+
+/* Contenitore principale: margini verticali dimezzati */
   .minimal-header-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 4rem 0 3rem 0; /* Spazio sopra e sotto per far respirare il layout */
+    margin: 2rem 0 1.5rem 0; 
   }
 
-  /* Blocco terminale: mantiene il testo allineato a sinistra per non rovinare l'output */
+  /* Blocco terminale: ora ha una larghezza fissa per evitare salti */
   .minimal-terminal {
     text-align: left;
-    font-family: 'Fira Code', 'Courier New', monospace;
-    min-height: 100px; /* Previene "salti" visivi quando compare l'output */
-    margin-bottom: 10px; /* Spazio sottile tra terminale e sottotitolo */
-  }
+    font-family: '0xProto', 'Fira Code', 'Courier New', monospace;
+    min-height: 120px; 
+    margin-bottom: 5px; 
+    width: 75ch;         
+    max-width: 100%;     
+    padding: 0 15px;
+  }  
 
-  /* Riga del comando (Più grande per riprendere lo stile dell'immagine) */
+  /* Riga del comando: font più piccolo (da 1.8rem a 1.3rem) */
   .terminal-line {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
   }
 
-  /* Colori del prompt: mantengo verde per l'utente e rosso per root */
   .prompt-user { color: #50fa7b; }
   .prompt-root { color: #ff5555; }
   .command { color: #e0e0e0; }
 
-  /* Output testuale dei comandi */
+  /* Output testuale: font rimpicciolito (da 1.1rem a 0.95rem) */
   .output {
     color: #a0a0a0;
-    font-size: 1.1rem;
-    line-height: 1.5;
-    white-space: pre-wrap; /* Mantiene gli a capo dell'output */
+    font-size: 0.95rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
   }
 
-  /* Il cursore verde rettangolare dell'immagine */
+  /* Il cursore proporzionato al nuovo testo */
   .cursor {
     display: inline-block;
-    width: 14px;
+    width: 12px;
     height: 1.1em;
-    background-color: #87af5f; /* Verde opaco in stile retro */
-    vertical-align: bottom;
-    margin-left: 6px;
+    background-color: #87af5f;
+    vertical-align: text-bottom; /* Allinea alla base del testo, non del contenitore */
+    position: relative;
+    top: -2px; /* Micro-regolazione verso l'alto. Metti -3px o -4px se lo vedi ancora basso */
+    margin-left: 4px;
     animation: blink 1s step-end infinite;
   }
 
@@ -67,55 +74,85 @@
     50% { opacity: 0; }
   }
 
-  /* Sottotitolo fuso sotto il comando, senza bordi */
+  /* Sottotitolo: rimpicciolito per essere più discreto */
   .terminal-subtitle {
     text-align: center;
     color: #888888;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     max-width: 600px;
   }
 </style>
 
 <!-- LOGICA JAVASCRIPT -->
 <script>
+  // La sequenza con le nuove regole per ogni comando
   const terminalScript = [
     { 
       prompt: "simone@localhost:~$ ", 
       isRoot: false, 
       cmd: "whoami", 
-      out: "simone" 
+      out: "simone",
+      delayAfter: 3000,  // Secondi di attesa prima di cancellare
+      backspace: true    // Attiva la cancellazione lettera per lettera
     },
     { 
       prompt: "simone@localhost:~$ ", 
       isRoot: false, 
       cmd: "sudo -l", 
-      out: "\nUser simone may run the following commands on localhost:\n    (root) NOPASSWD: /opt/portfolio/exploit_portfolio.sh" 
+      out: "User simone may run the following commands on localhost:\n    (root) NOPASSWD: /usr/bin/python3",
+      delayAfter: 4000,
+      backspace: true
     },
     { 
       prompt: "simone@localhost:~$ ", 
       isRoot: false, 
-      cmd: "sudo /opt/portfolio/exploit_portfolio.sh", 
-      out: "[*] Bypassing security controls...\n[*] Elevating privileges...\n[+] Root shell spawned!" 
+      cmd: "sudo python3 -c 'import os; os.system(\"/bin/bash\")'", 
+      out: "", 
+      delayAfter: 400,   // Attesa quasi nulla
+      backspace: false   // NESSUNA cancellazione: passa diretto alla shell
     },
     { 
       prompt: "root@localhost:~# ", 
       isRoot: true, 
       cmd: "whoami", 
-      out: "root" 
+      out: "root",
+      delayAfter: 3000,
+      backspace: true
+    },
+    { 
+      prompt: "root@localhost:~# ", 
+      isRoot: true, 
+      cmd: "cat /root/flag.txt", 
+      out: "HTB{w3lc0m3_t0_my_p0rtf0l10}",
+      delayAfter: 6000,
+      backspace: true
     }
   ];
 
+  // Funzione di pausa
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+  // Simula la scrittura in avanti
   async function typeWriter(element, text) {
     element.textContent = "";
     for (let i = 0; i < text.length; i++) {
       element.textContent += text.charAt(i);
-      await sleep(Math.random() * 50 + 50); 
+      await sleep(Math.random() * 50 + 50); // Velocità casuale per realismo
     }
   }
 
+  // Simula la pressione del tasto Backspace (cancellazione all'indietro)
+  async function backspaceWriter(element) {
+    let text = element.textContent;
+    while (text.length > 0) {
+      text = text.slice(0, -1);
+      element.textContent = text;
+      await sleep(30); // Cancellazione veloce, come se si tenesse premuto il tasto
+    }
+  }
+
+  // Motore principale dell'animazione
   async function runTerminal() {
     const promptEl = document.getElementById('prompt');
     const cmdEl = document.getElementById('command');
@@ -126,21 +163,42 @@
     while (true) {
       const step = terminalScript[i];
       
+      // 1. Setup iniziale del prompt
       outEl.textContent = "";
+      cmdEl.textContent = ""; 
       promptEl.textContent = step.prompt;
       promptEl.className = step.isRoot ? "prompt-root" : "prompt-user";
 
-      await sleep(1000);
+      // 2. Pausa prima di scrivere
+      await sleep(800);
+
+      // 3. Scrive il comando
       await typeWriter(cmdEl, step.cmd);
+
+      // 4. Pausa per simulare l'Invio
       await sleep(400);
-      outEl.innerHTML = step.out.replace(/\n/g, '<br>');
-      await sleep(3000);
-      
-      cmdEl.textContent = "";
+
+      // 5. Stampa l'output (se presente)
+      if (step.out !== "") {
+        outEl.innerHTML = step.out.replace(/\n/g, '<br>');
+      }
+
+      // 6. Attesa personalizzata post-comando
+      await sleep(step.delayAfter);
+
+      // 7. Fase di pulizia (se backspace è true)
+      if (step.backspace) {
+        outEl.textContent = ""; // Fa scomparire prima l'output
+        await sleep(200);       // Brevissima pausa
+        await backspaceWriter(cmdEl); // Cancella il comando lettera per lettera
+      }
+
+      // Passa al comando successivo
       i = (i + 1) % terminalScript.length;
     }
   }
 
+  // Avvio al caricamento
   document.addEventListener("DOMContentLoaded", () => {
     runTerminal();
   });
