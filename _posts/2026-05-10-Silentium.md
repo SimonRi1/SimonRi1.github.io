@@ -1,9 +1,9 @@
 ---
 title: Silentium
 description: This is a writeup for Silentium, an Easy-rated Linux machine from Hack The Box. This box focuses on exploiting a vulnerable web service and requires basic Linux enumeration for root "Gogs" service and get the flags.
-date: 2026-04-28
+date: 2026-05-10
 toc: true
-categories: [HTB, WriteUps]
+categories: [HTB, Writeup]
 tags: [linux, easy, season 10, cve, web, api]
 image: /assets/img/htb/silentium/Silentium_cover.png
 ---

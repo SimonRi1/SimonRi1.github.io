@@ -1,0 +1,147 @@
+<!-- STRUTTURA HTML MINIMALISTA -->
+<div class="minimal-header-wrapper">
+  <div class="minimal-terminal">
+    <div class="terminal-line">
+      <span id="prompt" class="prompt-user">simone@localhost:~$ </span>
+      <span id="command" class="command"></span><span class="cursor">&nbsp;</span>
+    </div>
+    <div id="output" class="output"></div>
+  </div>
+	
+  <div class="terminal-subtitle">
+    A technical portfolio: Security projects, CTF writeups, and detailed technical documentation.
+  </div>
+</div>
+
+<!-- STILI CSS -->
+<style>
+  /* Contenitore principale: centra tutto nella pagina */
+  .minimal-header-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 4rem 0 3rem 0; /* Spazio sopra e sotto per far respirare il layout */
+  }
+
+  /* Blocco terminale: mantiene il testo allineato a sinistra per non rovinare l'output */
+  .minimal-terminal {
+    text-align: left;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    min-height: 100px; /* Previene "salti" visivi quando compare l'output */
+    margin-bottom: 10px; /* Spazio sottile tra terminale e sottotitolo */
+  }
+
+  /* Riga del comando (Più grande per riprendere lo stile dell'immagine) */
+  .terminal-line {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+
+  /* Colori del prompt: mantengo verde per l'utente e rosso per root */
+  .prompt-user { color: #50fa7b; }
+  .prompt-root { color: #ff5555; }
+  .command { color: #e0e0e0; }
+
+  /* Output testuale dei comandi */
+  .output {
+    color: #a0a0a0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    white-space: pre-wrap; /* Mantiene gli a capo dell'output */
+  }
+
+  /* Il cursore verde rettangolare dell'immagine */
+  .cursor {
+    display: inline-block;
+    width: 14px;
+    height: 1.1em;
+    background-color: #87af5f; /* Verde opaco in stile retro */
+    vertical-align: bottom;
+    margin-left: 6px;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Sottotitolo fuso sotto il comando, senza bordi */
+  .terminal-subtitle {
+    text-align: center;
+    color: #888888;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 1.1rem;
+    max-width: 600px;
+  }
+</style>
+
+<!-- LOGICA JAVASCRIPT -->
+<script>
+  const terminalScript = [
+    { 
+      prompt: "simone@localhost:~$ ", 
+      isRoot: false, 
+      cmd: "whoami", 
+      out: "simone" 
+    },
+    { 
+      prompt: "simone@localhost:~$ ", 
+      isRoot: false, 
+      cmd: "sudo -l", 
+      out: "\nUser simone may run the following commands on localhost:\n    (root) NOPASSWD: /opt/portfolio/exploit_portfolio.sh" 
+    },
+    { 
+      prompt: "simone@localhost:~$ ", 
+      isRoot: false, 
+      cmd: "sudo /opt/portfolio/exploit_portfolio.sh", 
+      out: "[*] Bypassing security controls...\n[*] Elevating privileges...\n[+] Root shell spawned!" 
+    },
+    { 
+      prompt: "root@localhost:~# ", 
+      isRoot: true, 
+      cmd: "whoami", 
+      out: "root" 
+    }
+  ];
+
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  async function typeWriter(element, text) {
+    element.textContent = "";
+    for (let i = 0; i < text.length; i++) {
+      element.textContent += text.charAt(i);
+      await sleep(Math.random() * 50 + 50); 
+    }
+  }
+
+  async function runTerminal() {
+    const promptEl = document.getElementById('prompt');
+    const cmdEl = document.getElementById('command');
+    const outEl = document.getElementById('output');
+
+    let i = 0;
+
+    while (true) {
+      const step = terminalScript[i];
+      
+      outEl.textContent = "";
+      promptEl.textContent = step.prompt;
+      promptEl.className = step.isRoot ? "prompt-root" : "prompt-user";
+
+      await sleep(1000);
+      await typeWriter(cmdEl, step.cmd);
+      await sleep(400);
+      outEl.innerHTML = step.out.replace(/\n/g, '<br>');
+      await sleep(3000);
+      
+      cmdEl.textContent = "";
+      i = (i + 1) % terminalScript.length;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    runTerminal();
+  });
+</script>
