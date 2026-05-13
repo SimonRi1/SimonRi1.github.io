@@ -16,7 +16,7 @@ timezone: Europe/Rome
 
 title: "Simone ~ $" # the main title
 
-tagline: # "A technical portfolio: Security projects, CTF writeups, and detailed technical documentation."  # it will display as the subtitle
+tagline: "A technical portfolio: Security projects, CTF writeups, and detailed technical documentation."  # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   Welcome to my digital brain. This blog documents my journey through cybersecurity, featuring practical writeups, infrastructure setups, and notes on tackling complex security challenges.

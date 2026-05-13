@@ -7,66 +7,94 @@
     </div>
     <div id="output" class="output"></div>
   </div>
-	
-  <div class="terminal-subtitle">
-    A technical portfolio: Security projects, CTF writeups, and detailed technical documentation.
-  </div>
 </div>
 
 <!-- STILI CSS -->
 <style>
+  /* --- VARIABILI COLORI: TEMA SCURO (Default) --- */
+  :root {
+    --term-user: #50fa7b;     /* Verde fluo */
+    --term-root: #ff5555;     /* Rosso acceso */
+    --term-cmd: #e0e0e0;      /* Grigio chiarissimo */
+    --term-out: #999999;      /* Grigio medio */
+    --term-cursor: #50fa7b;   /* Verde fluo */
+    --term-subtitle: #888888; /* Grigio scuro */
+  }
 
-@import url('https://cdn.jsdelivr.net/npm/@fontsource/0xproto/index.css');
+  /* --- VARIABILI COLORI: TEMA CHIARO (Attivato dal bottone di Chirpy) --- */
+  html[data-mode="light"] {
+    --term-user: #0fa93c;     /* Verde più scuro per essere leggibile sul bianco */
+    --term-root: #d32f2f;     /* Rosso scuro/mattone */
+    --term-cmd: #24292e;      /* Nero (stile GitHub) per il testo del comando */
+    --term-out: #6a737d;      /* Grigio spento per l'output */
+    --term-cursor: #0fa93c;   /* Verde più scuro */
+    --term-subtitle: #586069; /* Grigio leggibile */
+  }
 
-/* Contenitore principale: margini verticali dimezzati */
+  /* Fallback nel caso in cui il tema chiaro sia quello di sistema ma il bottone non sia stato premuto */
+  @media (prefers-color-scheme: light) {
+    html:not([data-mode="dark"]) {
+      --term-user: #0fa93c;
+      --term-root: #d32f2f;
+      --term-cmd: #24292e;
+      --term-out: #6a737d;
+      --term-cursor: #0fa93c;
+      --term-subtitle: #586069;
+    }
+  }
+
+  /* Contenitore principale */
   .minimal-header-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 2rem 0 1.5rem 0; 
+    margin: 3rem 0 3rem 0; 
   }
 
-  /* Blocco terminale: ora ha una larghezza fissa per evitare salti */
+  /* Il blocco terminale: larghezza fissa per evitare salti */
   .minimal-terminal {
-    text-align: left;
-    font-family: '0xProto', 'Fira Code', 'Courier New', monospace;
+    text-align: left; 
+    font-family: 'Fira Code', 'Courier New', monospace; 
     min-height: 120px; 
-    margin-bottom: 5px; 
-    width: 75ch;         
-    max-width: 100%;     
-    padding: 0 15px;
-  }  
+    margin-bottom: 15px; 
+    width: 640px; 
+    max-width: 90vw; 
+  }
 
-  /* Riga del comando: font più piccolo (da 1.8rem a 1.3rem) */
+  /* Riga del comando */
   .terminal-line {
     font-size: 1.3rem;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
-  .prompt-user { color: #50fa7b; }
-  .prompt-root { color: #ff5555; }
-  .command { color: #e0e0e0; }
+  /* I colori ora richiamano le variabili dinamiche definite in alto */
+  .prompt-user { color: var(--term-user); font-weight: bold; transition: color 0.3s ease; }
+  .prompt-root { color: var(--term-root); font-weight: bold; transition: color 0.3s ease; }
+  .command { color: var(--term-cmd); transition: color 0.3s ease; }
 
-  /* Output testuale: font rimpicciolito (da 1.1rem a 0.95rem) */
+  /* Output testuale */
   .output {
-    color: #a0a0a0;
-    font-size: 0.95rem;
-    line-height: 1.4;
+    color: var(--term-out);
+    font-size: 0.95rem; 
+    line-height: 1.5;
     white-space: pre-wrap;
+    padding-left: 2px;
+    transition: color 0.3s ease;
   }
 
-  /* Il cursore proporzionato al nuovo testo */
+  /* Cursore verde dinamico */
   .cursor {
     display: inline-block;
     width: 12px;
     height: 1.1em;
-    background-color: #87af5f;
-    vertical-align: text-bottom; /* Allinea alla base del testo, non del contenitore */
+    background-color: var(--term-cursor);
+    vertical-align: text-bottom;
     position: relative;
-    top: -2px; /* Micro-regolazione verso l'alto. Metti -3px o -4px se lo vedi ancora basso */
+    top: -2px; 
     margin-left: 4px;
     animation: blink 1s step-end infinite;
+    transition: background-color 0.3s ease;
   }
 
   @keyframes blink {
@@ -74,13 +102,15 @@
     50% { opacity: 0; }
   }
 
-  /* Sottotitolo: rimpicciolito per essere più discreto */
+  /* Sottotitolo descrittivo */
   .terminal-subtitle {
     text-align: center;
-    color: #888888;
+    color: var(--term-subtitle);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 0.95rem;
+    font-size: 1rem;
     max-width: 600px;
+    line-height: 1.6;
+    transition: color 0.3s ease;
   }
 </style>
 
@@ -93,7 +123,7 @@
       isRoot: false, 
       cmd: "whoami", 
       out: "simone",
-      delayAfter: 3000,  // Secondi di attesa prima di cancellare
+      delayAfter: 2000,  // Secondi di attesa prima di cancellare
       backspace: true    // Attiva la cancellazione lettera per lettera
     },
     { 
@@ -117,7 +147,7 @@
       isRoot: true, 
       cmd: "whoami", 
       out: "root",
-      delayAfter: 3000,
+      delayAfter: 2000,
       backspace: true
     },
     { 
