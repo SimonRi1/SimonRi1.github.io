@@ -14,7 +14,7 @@ timezone: Europe/Rome
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: "Simone@CyberBlog" # the main title
+title: "Simone ~ $" # the main title
 
 tagline: "A technical portfolio: Security projects, CTF writeups, and detailed technical documentation."  # it will display as the subtitle
 
