@@ -116,15 +116,14 @@
 
 <!-- LOGICA JAVASCRIPT -->
 <script>
-  // La sequenza con le nuove regole per ogni comando
   const terminalScript = [
     { 
       prompt: "simone@localhost:~$ ", 
       isRoot: false, 
       cmd: "whoami", 
       out: "simone",
-      delayAfter: 2000,  // Secondi di attesa prima di cancellare
-      backspace: true    // Attiva la cancellazione lettera per lettera
+      delayAfter: 2000,
+      backspace: true
     },
     { 
       prompt: "simone@localhost:~$ ", 
@@ -139,8 +138,8 @@
       isRoot: false, 
       cmd: "sudo python3 -c 'import os; os.system(\"/bin/bash\")'", 
       out: "", 
-      delayAfter: 400,   // Attesa quasi nulla
-      backspace: false   // NESSUNA cancellazione: passa diretto alla shell
+      delayAfter: 400,
+      backspace: false
     },
     { 
       prompt: "root@localhost:~# ", 
@@ -154,82 +153,91 @@
       prompt: "root@localhost:~# ", 
       isRoot: true, 
       cmd: "cat /root/flag.txt", 
-      out: "HTB{w3lc0m3_t0_my_p0rtf0l10}",
+      out: "THM{w3lc0m3_t0_my_p0rtf0l10}",
       delayAfter: 6000,
       backspace: true
     }
   ];
 
-  // Funzione di pausa
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  // Simula la scrittura in avanti
   async function typeWriter(element, text) {
     element.textContent = "";
+    if (!text) return;
     for (let i = 0; i < text.length; i++) {
       element.textContent += text.charAt(i);
-      await sleep(Math.random() * 50 + 50); // Velocità casuale per realismo
+      await sleep(Math.random() * 50 + 50);
     }
   }
 
-  // Simula la pressione del tasto Backspace (cancellazione all'indietro)
   async function backspaceWriter(element) {
     let text = element.textContent;
     while (text.length > 0) {
       text = text.slice(0, -1);
       element.textContent = text;
-      await sleep(30); // Cancellazione veloce, come se si tenesse premuto il tasto
+      await sleep(30);
     }
   }
 
-  // Motore principale dell'animazione
+  // Variabile globale per evitare loop multipli se l'utente naviga avanti e indietro
+  window.terminalRunning = false;
+
   async function runTerminal() {
+    // Se l'animazione è già partita, non avviarne un'altra
+    if (window.terminalRunning) return;
+    
     const promptEl = document.getElementById('prompt');
     const cmdEl = document.getElementById('command');
     const outEl = document.getElementById('output');
 
+    // Se gli elementi non esistono (es. siamo in una pagina diversa), esci
+    if (!promptEl || !cmdEl || !outEl) return;
+
+    window.terminalRunning = true;
     let i = 0;
 
-    while (true) {
+    while (window.terminalRunning) {
       const step = terminalScript[i];
       
-      // 1. Setup iniziale del prompt
+      // Verifica sicurezza: se l'utente ha cambiato pagina, ferma tutto
+      if (!document.getElementById('prompt')) {
+        window.terminalRunning = false;
+        break;
+      }
+
       outEl.textContent = "";
       cmdEl.textContent = ""; 
       promptEl.textContent = step.prompt;
       promptEl.className = step.isRoot ? "prompt-root" : "prompt-user";
 
-      // 2. Pausa prima di scrivere
       await sleep(800);
-
-      // 3. Scrive il comando
       await typeWriter(cmdEl, step.cmd);
-
-      // 4. Pausa per simulare l'Invio
       await sleep(400);
 
-      // 5. Stampa l'output (se presente)
       if (step.out !== "") {
         outEl.innerHTML = step.out.replace(/\n/g, '<br>');
       }
 
-      // 6. Attesa personalizzata post-comando
       await sleep(step.delayAfter);
 
-      // 7. Fase di pulizia (se backspace è true)
       if (step.backspace) {
-        outEl.textContent = ""; // Fa scomparire prima l'output
-        await sleep(200);       // Brevissima pausa
-        await backspaceWriter(cmdEl); // Cancella il comando lettera per lettera
+        outEl.textContent = "";
+        await sleep(200);
+        await backspaceWriter(cmdEl);
       }
 
-      // Passa al comando successivo
       i = (i + 1) % terminalScript.length;
     }
   }
 
-  // Avvio al caricamento
-  document.addEventListener("DOMContentLoaded", () => {
+  // AVVIO IMMEDIATO + COMPATIBILITÀ CHIRPY
+  // Invece di solo DOMContentLoaded, proviamo diversi trigger
+  if (document.readyState === "complete" || document.readyState === "interactive") {
     runTerminal();
-  });
+  } else {
+    document.addEventListener("DOMContentLoaded", runTerminal);
+  }
+
+  // Supporto specifico per i temi che usano Pjax/Turbo (come Chirpy)
+  document.addEventListener("pjax:success", runTerminal);
 </script>
