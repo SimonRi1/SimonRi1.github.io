@@ -222,7 +222,7 @@ curl -s -X POST http://staging.silentium.htb/api/v1/account/login \
 
 <div class="callout callout-info" markdown="1">
 
-Take in mind that it needed to find the `bearer token` with burp. read more about this [JSON Web Tokens (JWT) & Bearer Authentication](JSON%20Web%20Tokens%20(JWT)%20&%20Bearer%20Authentication.md)
+Take in mind that it needed to find the `bearer token` with burp. read more about this JSON Web Tokens (JWT) & Bearer Authentication
 </div>
 
 Before starting the payload crafted, start the listener:
