@@ -1,7 +1,7 @@
 .callout {
   border-left: 4px solid var(--callout-color, #448aff);
-  background: rgba(var(--callout-color-rgb, 68, 138, 255), 0.1);
-  border-radius: 4px;
+  background-color: var(--callout-bg, rgba(68, 138, 255, 0.12));
+  border-radius: 6px;
   padding: 0.75em 1em;
   margin: 1em 0;
 }
@@ -9,7 +9,43 @@
   font-weight: 700;
   margin-bottom: 0.4em;
 }
-.callout-note    { --callout-color: #448aff; }
-.callout-tip     { --callout-color: #00bfa5; }
-.callout-warning { --callout-color: #ff9100; }
-.callout-danger  { --callout-color: #ff5252; }
+
+/* Light mode (default) */
+.callout-note,
+.callout-info {
+  --callout-color: #448aff;
+  --callout-bg: rgba(68, 138, 255, 0.12);
+}
+.callout-tip {
+  --callout-color: #00bfa5;
+  --callout-bg: rgba(0, 191, 165, 0.12);
+}
+.callout-warning {
+  --callout-color: #ff9100;
+  --callout-bg: rgba(255, 145, 0, 0.12);
+}
+.callout-danger {
+  --callout-color: #ff5252;
+  --callout-bg: rgba(255, 82, 82, 0.12);
+}
+
+/* Dark mode overrides — Chirpy sets data-mode="dark" on <html> */
+html[data-mode="dark"] {
+  .callout-note,
+  .callout-info {
+    --callout-color: #6ea8ff;
+    --callout-bg: rgba(110, 168, 255, 0.16);
+  }
+  .callout-tip {
+    --callout-color: #2de0c2;
+    --callout-bg: rgba(45, 224, 194, 0.16);
+  }
+  .callout-warning {
+    --callout-color: #ffb84d;
+    --callout-bg: rgba(255, 184, 77, 0.16);
+  }
+  .callout-danger {
+    --callout-color: #ff7b7b;
+    --callout-bg: rgba(255, 123, 123, 0.16);
+  }
+}
