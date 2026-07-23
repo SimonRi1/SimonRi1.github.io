@@ -68,7 +68,8 @@ ff02::2         ip6-allrouters
 
 Here the page:
 ![](/assets/img/htb/silentium/Pasted%20image%2020260507181156.png)
-It can see in the title and in the code that this webserver running *Flowise* 
+
+It can see in the title and in the code that this webserver running **Flowise** 
 
 <div class="callout callout-info" markdown="1">
 <div class="callout-title">ℹ️ Flowise info</div>
