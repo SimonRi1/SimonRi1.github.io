@@ -53,7 +53,7 @@ gobuster vhost -u http://silentium.htb -w /usr/share/wordlists/dirb/big.txt --ap
 ```
 
 output:
-![](Pasted%20image%2020260507180812.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260507180812.png)
 
 Add this virtual host to the `hosts` file to access it
 ```shell
@@ -67,7 +67,7 @@ ff02::2         ip6-allrouters
 ```
 
 Here the page:
-![](Pasted%20image%2020260507181156.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260507181156.png)
 It can see in the title and in the code that this webserver running *Flowise* 
 
 <div class="callout callout-info" markdown="1">
@@ -86,19 +86,19 @@ is a critical authentication bypass vulnerability in Flowise, the popular drag-a
 </div>
 
 And metasploit offer this 2 exploit for this service:
-![](Pasted%20image%2020260507190523.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260507190523.png)
 
 There are also other exploit on github.
 
 For proceed to use the first CVE, it needed to find a valid user. Searching on the main page of the web server, there is this:
-![](Pasted%20image%2020260508102144.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260508102144.png)
 let's try this user to reset the password and gain access through the tokens without verification.
 
 <div class="callout callout-info" markdown="1">
 
 The structure of the json it can be found with burp:
-	![](Pasted%20image%2020260508104520.png)
-	![](Pasted%20image%2020260508104706.png)
+	![](/assets/img/htb/silentium/Pasted%20image%2020260508104520.png)
+	![](/assets/img/htb/silentium/Pasted%20image%2020260508104706.png)
 </div>
 
 Request the reset token:
@@ -178,10 +178,10 @@ Got 201 code. try to access with new credential:
 `ben@silentium.htb`:`Passowrd123!`
 
 login also through the web page:
-![](Pasted%20image%2020260508105914.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260508105914.png)
 
 search around it can be found the real version of the service:
-![](Pasted%20image%2020260508110003.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260508110003.png)
 ## Exploitation - Authenticated RCE & Docker Escape
 Knowing this place us in a position to search others exploits and use it to got a RCE:
 <div class="callout callout-warning" markdown="1">
@@ -212,7 +212,7 @@ The attack flow involves:
 5. The malicious code executes with full Node.js privileges, allowing the attacker to spawn child processes, access the filesystem, or perform other malicious actions
 
 API key to use for the above attack or JWT token:
-![](Pasted%20image%2020260508153910.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260508153910.png)
 
 ```shell
 curl -s -X POST http://staging.silentium.htb/api/v1/account/login \
@@ -239,16 +239,16 @@ curl -X POST http://staging.silentium.htb/api/v1/node-load-method/customMCP \
 ```
 
 And there it is:
-![](Pasted%20image%2020260508193736.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260508193736.png)
 ## Post-Exploitation
-![](Pasted%20image%2020260508203145.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260508203145.png)
 we are root inside docker. Let's find some valid credential in docker environment:
-![](Pasted%20image%2020260508203454.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260508203454.png)
 possible password:
 - F1l3_d0ck3r
 - `r04D!!_R4ge`
 try this password with ssh.the right one is the second
-![](Pasted%20image%2020260508205032.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260508205032.png)
 
 <div class="callout callout-tip" markdown="1">
 <div class="callout-title">✔️ User Flag</div>
@@ -333,7 +333,7 @@ If you just found Gogs running on a target machine, it is a massive point of int
 >4. **Version Vulnerabilities:** Look at the footer of the Gogs web page to find the version number. Older versions of Gogs have known vulnerabilities, including Remote Code Execution (RCE) and Server-Side Request Forgery (SSRF). You can use `searchsploit gogs` to check for specific exploits!
 
 Search in which port is running gogs:
-![](Pasted%20image%2020260509164624.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260509164624.png)
 In this case the service run on port **3001**.
 
 Searching around it can be found the PoC script in python for CVE-2025-8110:
@@ -350,13 +350,13 @@ ssh -L 8080:127.0.0.1:3001 ben@silentium.htb
 ```
 
 Now proceed with a manual attack (alternatively use the python script above):
-![](Pasted%20image%2020260509170115.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260509170115.png)
 
 Register a new account.
 `user1`:`Password123`
 
 Generate a new Token:
-![](Pasted%20image%2020260509170611.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260509170611.png)
 `9c9ab99c5ec6354733ccd234633abad25b56fcde`
 
 Clone the script and run a listener.
@@ -371,9 +371,9 @@ python3 exploit.py \
   --port 4446
 ```
 
-![637](Pasted%20image%2020260509174855.png)
+![637](/assets/img/htb/silentium/Pasted%20image%2020260509174855.png)
 Access gain, now search for the password:
-![](Pasted%20image%2020260509175029.png)
+![](/assets/img/htb/silentium/Pasted%20image%2020260509175029.png)
 
 <div class="callout callout-tip" markdown="1">
 <div class="callout-title">✔️ Root flag</div>
